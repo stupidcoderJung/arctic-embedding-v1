@@ -32,7 +32,7 @@ const embedding = await embedder.embedQuery("Your text here");
 
 **Why it's special:**
 - ✅ **No heavy dependencies** - Uses local C++ binary (no Python runtime needed)
-- ✅ **Consistent 1152-dimensional vectors** - Perfect for LanceDB schemas
+- ✅ **Consistent 384-dimensional vectors** - Perfect for LanceDB schemas
 - ✅ **Input sanitization** - Prevents command injection attacks
 - ✅ **Batch processing** - Efficient multi-document embedding
 - ✅ **Error resilient** - Graceful fallbacks and clear error messages
@@ -99,7 +99,7 @@ from arctic_embed import ArcticEmbedTiny
 
 embedder = ArcticEmbedTiny("arctic_model.onnx", "bin/vocab.txt")
 embedding = embedder.embed("Your text here")
-print(f"Embedding dimension: {len(embedding)}")  # 1152
+print(f"Embedding dimension: {len(embedding)}")  # 384
 ```
 
 ### TypeScript + LanceDB
@@ -140,7 +140,7 @@ const results = await table.search(queryVector).limit(10).execute();
 2. **TypeScript Plugin (`src/arctic-embeddings-lancedb.ts`)**
    - Spawn-based binary execution
    - Input sanitization
-   - Embedding normalization (1152-dim)
+   - Embedding normalization (384-dim)
    - Batch processing
 
 3. **Python Wrapper (`src/arctic_embed.py`)**
@@ -150,7 +150,7 @@ const results = await table.search(queryVector).limit(10).execute();
 
 ### Performance Characteristics
 
-- **Embedding Dimension**: 1152
+- **Embedding Dimension**: 384
 - **Max Sequence Length**: 512 tokens
 - **Vocabulary Size**: 30,522 tokens
 - **Model Size**: 86 MB
@@ -215,7 +215,7 @@ Download the ONNX model from Hugging Face (see Installation).
 Build the C++ binary using `make` or manual compilation (see Installation).
 
 ### "Embedding dimension mismatch"
-The plugin automatically normalizes to 1152 dimensions. Check LanceDB schema.
+The plugin automatically normalizes to 384 dimensions. Check LanceDB schema.
 
 ## 📝 License
 

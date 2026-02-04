@@ -9,8 +9,8 @@ export class ArcticEmbeddings {
   private binaryPath: string;
 
   constructor(
-    modelPath: string = '/Users/young/.openclaw/workspace/arctic_model.onnx',
-    binaryPath: string = '/Users/young/.openclaw/workspace/projects/arctic-embedding-v1/bin/arctic_embed_test'
+    modelPath: string = './arctic_model.onnx',
+    binaryPath: string = './bin/arctic_embed_test'
   ) {
     this.modelPath = modelPath;
     this.binaryPath = binaryPath;
@@ -87,7 +87,7 @@ export class ArcticEmbeddings {
               const embedding = JSON.parse(line.trim()) as number[];
               if (Array.isArray(embedding) && embedding.length > 0) {
                 // Ensure consistent embedding size by truncating or padding
-                const targetSize = 1152; // Standard size for Arctic-Embed-Tiny
+                const targetSize = 384; // Standard size for Arctic-Embed-Tiny
                 let normalizedEmbedding: number[];
 
                 if (embedding.length > targetSize) {
