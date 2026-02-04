@@ -1,6 +1,12 @@
 # Arctic Embedding V1 🏔️
 
+[![GitHub stars](https://img.shields.io/github/stars/stupidcoderJung/arctic-embedding-v1?style=social)](https://github.com/stupidcoderJung/arctic-embedding-v1/stargazers)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![OpenClaw Compatible](https://img.shields.io/badge/OpenClaw-Compatible-blue)](https://openclaw.ai)
+
 High-performance text embedding engine optimized for Apple Silicon (M1/M2/M3) using Snowflake's Arctic-Embed-Tiny model.
+
+> 🚀 **Built for OpenClaw + LanceDB** - Perfect for local RAG workflows, semantic search, and memory plugins!
 
 ## 🚀 Key Features
 
@@ -69,7 +75,7 @@ curl -L -o arctic_model.onnx \
   "https://huggingface.co/Snowflake/snowflake-arctic-embed-xs/resolve/main/onnx/model.onnx"
 ```
 
-3. **Build the C++ binary**
+3. **Build the C++ binary** (optional - pre-built binary included)
 ```bash
 make
 # or
@@ -109,8 +115,8 @@ import { connect } from 'vectordb';
 
 // Initialize embedder
 const embedder = new ArcticEmbeddings(
-  '/path/to/arctic_model.onnx',
-  '/path/to/bin/arctic_embed_test'
+  './arctic_model.onnx',
+  './bin/arctic_embed_test'
 );
 
 // Connect to LanceDB
@@ -127,6 +133,24 @@ const queryVector = await embedder.embedQuery(query);
 const results = await table.search(queryVector).limit(10).execute();
 ```
 
+### 🦞 Use with OpenClaw
+
+Perfect for OpenClaw memory plugins and semantic search:
+
+```typescript
+// In your OpenClaw skill or plugin
+import { ArcticEmbeddings } from 'arctic-embedding-v1/src/arctic-embeddings-lancedb';
+
+const embedder = new ArcticEmbeddings();
+
+// Generate embeddings for user queries
+const userQuery = "Find documents about machine learning";
+const queryEmbedding = await embedder.embedQuery(userQuery);
+
+// Use with LanceDB for semantic search
+// ... your LanceDB search code
+```
+
 ## 🏗️ Architecture
 
 ### Components
@@ -134,8 +158,8 @@ const results = await table.search(queryVector).limit(10).execute();
 1. **C++ Core (`src/arctic_embed_tiny.cpp`)**
    - ONNX Runtime integration
    - Vocabulary tokenization
-   - Embedding generation
-   - Persistent process mode (coming soon)
+   - Embedding generation with mean pooling
+   - 384-dimensional output (accurate!)
 
 2. **TypeScript Plugin (`src/arctic-embeddings-lancedb.ts`)**
    - Spawn-based binary execution
@@ -175,6 +199,7 @@ Cold start: <100ms
 - **Content Recommendation**: Find related articles/documents
 - **Duplicate Detection**: Identify similar content
 - **Classification**: Pre-compute embeddings for ML pipelines
+- **OpenClaw Memory Plugins**: Enhance your AI assistant with semantic memory
 
 ## 📁 Project Structure
 
@@ -212,10 +237,14 @@ arctic-embedding-v1/
 Download the ONNX model from Hugging Face (see Installation).
 
 ### "Binary file not found"
-Build the C++ binary using `make` or manual compilation (see Installation).
+A pre-built binary is included in `bin/arctic_embed_test`. If you need to rebuild, use `make`.
 
 ### "Embedding dimension mismatch"
 The plugin automatically normalizes to 384 dimensions. Check LanceDB schema.
+
+## 🌟 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=stupidcoderJung/arctic-embedding-v1&type=Date)](https://star-history.com/#stupidcoderJung/arctic-embedding-v1&Date)
 
 ## 📝 License
 
@@ -226,16 +255,31 @@ MIT License - See LICENSE for details
 - [Snowflake Arctic Embed](https://huggingface.co/Snowflake/snowflake-arctic-embed-xs) - Base model
 - [ONNX Runtime](https://onnxruntime.ai/) - Inference engine
 - [LanceDB](https://lancedb.com/) - Vector database
+- [OpenClaw](https://openclaw.ai/) - Personal AI assistant platform
 
 ## 🚀 Roadmap
 
+- [x] 384-dim mean pooling (accurate!)
+- [x] Portable paths (clone & run)
+- [x] Pre-built binary
 - [ ] Persistent process mode (IPC-based)
 - [ ] Multi-threaded batch processing
 - [ ] WASM build for cross-platform support
 - [ ] Python wheel distribution
 - [ ] npm package for TypeScript plugin
-- [ ] GPU acceleration (CoreML)
+- [ ] ClawHub skill publication
+
+## 🤝 Contributing
+
+Contributions welcome! Please feel free to submit a Pull Request.
+
+## 💬 Community
+
+- [OpenClaw Discord](https://discord.com/invite/clawd) - Join #snsr or #skills
+- [ClawHub](https://clawhub.com) - Discover more OpenClaw skills
 
 ---
 
 Built with ❤️ for the OpenClaw AI ecosystem by [@stupidcoderJung](https://github.com/stupidcoderJung)
+
+**⭐ If this project helps you, please give it a star!**
