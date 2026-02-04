@@ -149,6 +149,7 @@ public:
     // Generate embeddings for input text
     std::vector<float> embed(const std::string& text) {
         std::vector<int64_t> input_ids = tokenize_text(text);
+        // Create attention mask based on actual tokenization (1 for real tokens, 0 for padding if any)
         std::vector<int64_t> attention_mask(input_ids.size(), 1);
         std::vector<int64_t> token_type_ids(input_ids.size(), 0);
 
@@ -252,14 +253,52 @@ public:
             auto tensor_info = type_info.GetTensorTypeAndShapeInfo();
             std::vector<int64_t> output_shape = tensor_info.GetShape();
 
-            size_t output_size = 1;
-            for (auto dim : output_shape) {
-                output_size *= dim;
+            // Apply mean pooling to get fixed-size embedding
+            // Assuming output shape is [batch_size, sequence_length, hidden_size]
+            if (output_shape.size() != 3) {
+                std::cerr << "Expected output shape to be 3D [batch, seq_len, hidden_size], got "
+                          << output_shape.size() << "D" << std::endl;
+                return {};
             }
 
-            // Create result vector with proper size
-            std::vector<float> result(output_size);
-            std::copy(float_array_data, float_array_data + output_size, result.begin());
+            int64_t batch_size = output_shape[0];
+            int64_t seq_len = output_shape[1];
+            int64_t hidden_size = output_shape[2];
+
+            // Apply mean pooling with attention mask
+            std::vector<float> pooled_result(hidden_size, 0.0f);
+            int valid_tokens_count = 0;
+
+            // Count valid tokens based on attention mask (take only the relevant portion)
+            int actual_seq_len = std::min(static_cast<int>(seq_len), static_cast<int>(input_ids.size()));
+            for (int i = 0; i < actual_seq_len; ++i) {
+                if (attention_mask[i] == 1) {
+                    valid_tokens_count++;
+                }
+            }
+
+            // Sum up the embeddings for valid tokens only
+            for (int h = 0; h < hidden_size; ++h) {
+                float sum = 0.0f;
+                for (int s = 0; s < actual_seq_len; ++s) {
+                    if (attention_mask[s] == 1) {  // Only consider unmasked tokens
+                        sum += float_array_data[s * hidden_size + h];  // [seq_len, hidden_size] layout
+                    }
+                }
+
+                if (valid_tokens_count > 0) {
+                    pooled_result[h] = sum / valid_tokens_count;  // Mean pooling
+                } else {
+                    pooled_result[h] = 0.0f;  // Handle edge case where no tokens are valid
+                }
+            }
+
+            // Ensure output is always exactly 384 dimensions
+            std::vector<float> result(384, 0.0f);
+
+            // Copy values from pooled_result to result vector of fixed size 384
+            size_t copy_size = std::min(pooled_result.size(), static_cast<size_t>(384));
+            std::copy(pooled_result.begin(), pooled_result.begin() + copy_size, result.begin());
 
             // Normalize the embedding (L2 normalization)
             normalize_embedding(result);
