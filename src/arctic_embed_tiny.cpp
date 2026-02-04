@@ -57,7 +57,7 @@ public:
         Ort::SessionOptions session_options;
 
         // Optimize for CPU on M1
-        session_options.SetIntraOpNumThreads(2);  // Reduce threads to save memory on 8GB systems
+        session_options.SetIntraOpNumThreads(4);  // Changed from 2 to 4 threads for better performance
         session_options.SetInterOpNumThreads(2);  // Reduce threads to save memory on 8GB systems
         session_options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
 
@@ -145,7 +145,7 @@ public:
         // Explicitly reset session to free memory
         session_.reset();
     }
-    
+
     // Generate embeddings for input text
     std::vector<float> embed(const std::string& text) {
         std::vector<int64_t> input_ids = tokenize_text(text);
@@ -323,7 +323,7 @@ public:
             return {};
         }
     }
-    
+
 private:
     // Initialize vocabulary from file
     bool initialize_vocab(const std::string& vocab_path) {
