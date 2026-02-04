@@ -29,6 +29,7 @@
 #include <cmath>
 #include <unordered_map>
 #include <sstream>
+#include <fstream>
 
 class ArcticEmbedTiny {
 private:
@@ -51,7 +52,7 @@ private:
     size_t max_length_;
 
 public:
-    ArcticEmbedTiny(const std::string& model_path) : unk_token_id_(100), cls_token_id_(101), sep_token_id_(102), pad_token_id_(0), max_length_(512) {
+    ArcticEmbedTiny(const std::string& model_path, const std::string& vocab_path = "") : unk_token_id_(100), cls_token_id_(101), sep_token_id_(102), pad_token_id_(0), max_length_(512) {
         // Configure session options for optimal performance on M1
         Ort::SessionOptions session_options;
 
@@ -128,8 +129,16 @@ public:
             output_node_dims_[i] = output_tensor_info.GetShape();
         }
 
-        // Initialize vocabulary for tokenization (in a real implementation, this would be loaded from a file)
-        initialize_vocab();
+        // Initialize vocabulary for tokenization
+        if (!vocab_path.empty()) {
+            if (!initialize_vocab(vocab_path)) {
+                std::cerr << "Warning: Failed to load vocabulary from '" << vocab_path << "', falling back to built-in vocabulary." << std::endl;
+                initialize_builtin_vocab();
+            }
+        } else {
+            std::cerr << "Warning: No vocabulary file provided, using built-in vocabulary." << std::endl;
+            initialize_builtin_vocab();
+        }
     }
 
     ~ArcticEmbedTiny() {
@@ -277,8 +286,31 @@ public:
     }
     
 private:
-    // Initialize vocabulary for tokenization (in a real implementation, this would be loaded from a file)
-    void initialize_vocab() {
+    // Initialize vocabulary from file
+    bool initialize_vocab(const std::string& vocab_path) {
+        std::ifstream vocab_file(vocab_path);
+        if (!vocab_file.is_open()) {
+            return false;
+        }
+
+        vocab_.clear();  // Clear any existing vocabulary
+        std::string token;
+        int64_t id = 0;
+
+        while (std::getline(vocab_file, token)) {
+            // Trim whitespace from token
+            token.erase(0, token.find_first_not_of(" \t\r\n"));
+            token.erase(token.find_last_not_of(" \t\r\n") + 1);
+
+            vocab_[token] = id++;
+        }
+
+        vocab_file.close();
+        return true;
+    }
+
+    // Initialize built-in vocabulary for fallback
+    void initialize_builtin_vocab() {
         // This is a simplified vocabulary for demonstration purposes
         // In a real implementation, you would load this from a tokenizer file
         vocab_["[UNK]"] = unk_token_id_;
@@ -497,13 +529,14 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-    if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <model_path> <input_text>" << std::endl;
+    if (argc < 3 || argc > 4) {
+        std::cerr << "Usage: " << argv[0] << " <model_path> <input_text> [vocab_path]" << std::endl;
         return 1;
     }
 
     std::string model_path = argv[1];
     std::string input_text = argv[2];
+    std::string vocab_path = (argc == 4) ? argv[3] : "";
 
     try {
         // Monitor memory before loading model
@@ -514,7 +547,7 @@ int main(int argc, char* argv[]) {
         std::cout << "Loading Arctic Embed Tiny model..." << std::endl;
 
         // Load model in a separate scope to ensure memory management
-        std::unique_ptr<ArcticEmbedTiny> embedder = std::make_unique<ArcticEmbedTiny>(model_path);
+        std::unique_ptr<ArcticEmbedTiny> embedder = std::make_unique<ArcticEmbedTiny>(model_path, vocab_path);
 
         std::cout << "Generating embedding for: \"" << input_text << "\"" << std::endl;
 
