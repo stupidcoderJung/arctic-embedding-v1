@@ -100,18 +100,19 @@ int main(int argc, char* argv[]) {
             
             auto [input_ids, attention_mask] = simple_tokenize(input_text);
             
-            std::cout << "🚀 Running internal benchmark (100 iterations)..." << std::endl;
+            std::cout << "🚀 Running internal benchmark (1000 iterations)..." << std::endl;
             
-            // Warmup
-            for(int i=0; i<10; ++i) embedder.embed(input_ids, attention_mask);
+            // Warmup (50 runs)
+            for(int i=0; i<50; ++i) embedder.embed(input_ids, attention_mask);
             
             auto start = std::chrono::high_resolution_clock::now();
-            for(int i=0; i<100; ++i) {
+            for(int i=0; i<1000; ++i) {
                 embedder.embed(input_ids, attention_mask);
             }
             auto end = std::chrono::high_resolution_clock::now();
             
-            double avg_ms = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000.0 / 100.0;
+            double total_ms = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000.0;
+            double avg_ms = total_ms / 1000.0;
             
             std::cout << "\n==================================================" << std::endl;
             std::cout << "🔥 PURE INFERENCE LATENCY: " << avg_ms << " ms" << std::endl;
