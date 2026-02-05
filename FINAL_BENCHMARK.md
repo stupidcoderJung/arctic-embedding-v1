@@ -1,5 +1,9 @@
 # Final Benchmark Results - Arctic Embedding V1
 
+[🇰🇷 한국어 버전(Korean)](./FINAL_BENCHMARK_KR.md)
+
+---
+
 **Test Environment**: MacBook Air M1, 8GB RAM, macOS Sequoia
 **Test Date**: 2026-02-05
 **Test Input**: "OpenClaw is an AI assistant framework"

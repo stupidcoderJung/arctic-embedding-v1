@@ -2,6 +2,10 @@
 
 **The fastest local embedding engine for Apple Silicon.**
 
+[🇰🇷 한국어 버전(Korean)](./README_KR.md)
+
+---
+
 Arctic Embedding V1 is a high-performance C++ implementation of the **Snowflake-Arctic-Embed-Tiny** model, optimized specifically for MacBook Air/Pro (M1/M2/M3) using **LibTorch and Metal Performance Shaders (MPS)**.
 
 ## 🚀 Performance at a Glance
