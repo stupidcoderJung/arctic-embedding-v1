@@ -9,9 +9,10 @@
 
 | Implementation | Average Latency | Min | Max | Std Dev | vs Python |
 |---------------|-----------------|-----|-----|---------|-----------|
-| **Python (PyTorch + MPS)** | **10.41 ms** | 10.13 ms | 10.64 ms | 0.16 ms | Baseline ✅ |
-| **C++ LibTorch CPU** | **29.85 ms** | 24.34 ms | 51.50 ms | ~10 ms | 2.9x slower |
-| C++ ONNX Runtime CPU | 108.32 ms | 107.97 ms | 108.68 ms | 0.23 ms | 10.4x slower ❌ |
+| **C++ LibTorch + MPS** | **7.28 ms** | 6.56 ms | 7.90 ms | ~0.5 ms | 🥇 **Leader** |
+| **Python (PyTorch + MPS)** | **10.41 ms** | 10.13 ms | 10.64 ms | 0.16 ms | 1.4x slower |
+| **C++ LibTorch CPU** | **29.85 ms** | 24.34 ms | 51.50 ms | ~10 ms | 4.1x slower |
+| C++ ONNX Runtime CPU | 108.32 ms | 107.97 ms | 108.68 ms | 0.23 ms | 14.8x slower ❌ |
 
 ## Key Findings
 

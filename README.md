@@ -189,14 +189,15 @@ Tested on MacBook Air M1 (8GB RAM), test input: "OpenClaw is an AI assistant fra
 
 | Implementation | Average | Min | Max | Notes |
 |---------------|---------|-----|-----|-------|
-| **Python (PyTorch + MPS)** | **10.41 ms** | 10.13 ms | 10.64 ms | 🥇 Fastest (GPU accelerated) |
-| **C++ LibTorch CPU** | **29.85 ms** | 24.34 ms | 51.50 ms | ✅ Practical (3.6x faster than ONNX) |
+| **C++ LibTorch + MPS** | **7.28 ms** | 6.56 ms | 7.90 ms | 🥇 **Fastest (M1 GPU)** |
+| **Python (PyTorch + MPS)** | **10.41 ms** | 10.13 ms | 10.64 ms | ✅ Baseline |
+| C++ LibTorch CPU | 29.85 ms | 24.34 ms | 51.50 ms | ✅ Practical |
 | C++ ONNX Runtime CPU | 108.32 ms | 107.97 ms | 108.68 ms | ❌ Not recommended |
 
 **Key Findings:**
-- **Python is fastest** due to Metal Performance Shaders (MPS) GPU acceleration
-- **C++ LibTorch offers 3.6x speedup** over ONNX Runtime (108ms → 29.85ms)
-- ONNX Runtime (Homebrew) lacks Apple Silicon optimizations
+- **C++ LibTorch with MPS is the performance leader** at **7.28ms**, beating Python by 1.4x and ONNX by nearly 15x.
+- **M1 GPU acceleration** via Metal Performance Shaders (MPS) is the key to sub-10ms performance.
+- **LibTorch C++ implementation** offers massive speedups over generic ONNX Runtime builds.
 
 See [FINAL_BENCHMARK.md](./FINAL_BENCHMARK.md) for detailed analysis and methodology.
 

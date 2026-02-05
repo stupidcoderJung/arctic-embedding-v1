@@ -15,11 +15,9 @@ private:
     
 public:
     ArcticEmbedLibTorch(const std::string& model_path) 
-        : device_(torch::kCPU) {  // Force CPU for now (model was traced on CPU)
+        : device_(torch::kMPS) {  // FORCE GPU 가속!
         
-        // MPS support requires model to be traced on MPS
-        // For now, using CPU (still faster than ONNX Runtime)
-        std::cout << "ℹ️  Using CPU (model traced on CPU)" << std::endl;
+        std::cout << "🚀 Using Metal Performance Shaders (MPS) for GPU acceleration" << std::endl;
         
         // Load TorchScript model
         try {
@@ -102,10 +100,21 @@ int main(int argc, char* argv[]) {
             
             auto [input_ids, attention_mask] = simple_tokenize(input_text);
             
-            std::cout << "Generating embedding..." << std::endl;
-            auto embedding = embedder.embed(input_ids, attention_mask);
+            std::cout << "🚀 Running internal benchmark (100 iterations)..." << std::endl;
             
-            std::cout << "✅ Generated embedding of size: " << embedding.size() << std::endl;
+            // Warmup
+            for(int i=0; i<10; ++i) embedder.embed(input_ids, attention_mask);
+            
+            auto start = std::chrono::high_resolution_clock::now();
+            for(int i=0; i<100; ++i) {
+                embedder.embed(input_ids, attention_mask);
+            }
+            auto end = std::chrono::high_resolution_clock::now();
+            
+            double avg_ms = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000.0 / 100.0;
+            
+            std::cout << "\n==================================================" << std::endl;
+            std::cout << "🔥 PURE INFERENCE LATENCY: " << avg_ms << " ms" << std::endl;
             std::cout << "==================================================" << std::endl;
         }
         
