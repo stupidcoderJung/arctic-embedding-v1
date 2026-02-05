@@ -200,6 +200,7 @@ Tested on MacBook Air M1 (8GB RAM), test input: "OpenClaw is an AI assistant fra
 - **Reliable Benchmarks**: All results are based on 1,000 controlled iterations with thermal stabilization.
 
 See [FINAL_BENCHMARK.md](./FINAL_BENCHMARK.md) for detailed analysis and methodology.
+For a detailed history of technical decisions and performance evolution, see [ADR 0001: Switching to LibTorch MPS](./docs/adr/0001-switching-to-libtorch-mps-for-sub-10ms-latency.md).
 
 ### Model Load Time
 - Python: ~6.2 seconds (first load only, cached afterward)
