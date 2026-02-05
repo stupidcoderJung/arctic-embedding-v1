@@ -20,8 +20,8 @@ High-performance text embedding engine optimized for Apple Silicon (M1/M2/M3) us
 
 ### Performance Optimized for Apple Silicon
 - Native ARM64 architecture support
-- Metal Performance Shaders (MPS) acceleration
-- ~10-50ms embedding generation (depending on text length)
+- Metal Performance Shaders (MPS) acceleration via PyTorch
+- **10-30ms** embedding generation (Python MPS: 10ms, C++ LibTorch: 30ms)
 - Minimal memory footprint (~100MB)
 
 ### LanceDB Plugin - Game Changer 🎮
@@ -47,11 +47,11 @@ const embedding = await embedder.embedQuery("Your text here");
 
 | Feature | Arctic V1 + LanceDB | Standard Python | Cloud APIs |
 |---------|---------------------|-----------------|------------|
-| **Startup Time** | <100ms | 2-5s | N/A |
+| **Startup Time** | <1s | 2-5s | N/A |
 | **Memory Usage** | ~100MB | ~500MB-1GB | N/A |
 | **Cost** | $0 | $0 | $$$ |
 | **Privacy** | 100% local | 100% local | ❌ Cloud |
-| **Speed** | ⚡ 10-50ms | 🐢 100-300ms | 🌐 200-1000ms |
+| **Speed** | ⚡ **10-30ms** | 🐢 100-300ms | 🌐 200-1000ms |
 
 ## 📦 Installation
 
@@ -183,14 +183,27 @@ const queryEmbedding = await embedder.embedQuery(userQuery);
 
 ## 📊 Benchmarks
 
-Tested on MacBook Air M1 (8GB RAM):
+Tested on MacBook Air M1 (8GB RAM), test input: "OpenClaw is an AI assistant framework"
 
-```
-Single embedding (50 tokens):  ~15ms
-Single embedding (200 tokens): ~35ms
-Batch (10 docs, avg 100 tokens): ~250ms
-Cold start: <100ms
-```
+### Honest Performance Results
+
+| Implementation | Average | Min | Max | Notes |
+|---------------|---------|-----|-----|-------|
+| **Python (PyTorch + MPS)** | **10.41 ms** | 10.13 ms | 10.64 ms | 🥇 Fastest (GPU accelerated) |
+| **C++ LibTorch CPU** | **29.85 ms** | 24.34 ms | 51.50 ms | ✅ Practical (3.6x faster than ONNX) |
+| C++ ONNX Runtime CPU | 108.32 ms | 107.97 ms | 108.68 ms | ❌ Not recommended |
+
+**Key Findings:**
+- **Python is fastest** due to Metal Performance Shaders (MPS) GPU acceleration
+- **C++ LibTorch offers 3.6x speedup** over ONNX Runtime (108ms → 29.85ms)
+- ONNX Runtime (Homebrew) lacks Apple Silicon optimizations
+
+See [FINAL_BENCHMARK.md](./FINAL_BENCHMARK.md) for detailed analysis and methodology.
+
+### Model Load Time
+- Python: ~6.2 seconds (first load only, cached afterward)
+- C++ LibTorch: <1 second
+- C++ ONNX: <1 second
 
 ## 🤝 Use Cases
 

@@ -1,0 +1,22 @@
+# Makefile for Arctic Embed Optimized
+CXX = clang++
+CXXFLAGS = -std=c++17 -O3 -march=native -Ofast -flto -ffast-math
+LDFLAGS = -framework Foundation -framework Accelerate -flto
+
+# ONNX Runtime paths
+ONNXRUNTIME_INCLUDE = /opt/homebrew/include/onnxruntime
+LIBS = -L/opt/homebrew/lib -lonnxruntime
+INCLUDES = -I$(ONNXRUNTIME_INCLUDE)
+
+SRC = src/arctic_embed_tiny_optimized.cpp
+TARGET = bin/arctic_embed_optimized
+
+all: $(TARGET)
+
+$(TARGET): $(SRC)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $< $(LDFLAGS) $(LIBS)
+
+clean:
+	rm -f $(TARGET)
+
+.PHONY: all clean
