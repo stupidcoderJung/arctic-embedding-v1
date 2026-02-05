@@ -9,21 +9,11 @@ export class ArcticEmbeddings {
   private binaryPath: string;
 
   constructor(
-    modelPath: string = './arctic_model.onnx',
-    binaryPath: string = './bin/arctic_embed_test'
+    modelPath: string = './arctic_model_mps.pt',
+    binaryPath: string = './arctic_embed_mps'
   ) {
     this.modelPath = modelPath;
     this.binaryPath = binaryPath;
-
-    // Validate that the model file exists
-    if (!fs.existsSync(this.modelPath)) {
-      throw new Error(`Model file not found: ${this.modelPath}`);
-    }
-
-    // Validate that the binary file exists
-    if (!fs.existsSync(this.binaryPath)) {
-      throw new Error(`Binary file not found: ${this.binaryPath}`);
-    }
   }
 
   /**
@@ -55,11 +45,14 @@ export class ArcticEmbeddings {
     const sanitizedText = this.sanitizeText(text);
 
     return new Promise<number[]>((resolve, reject) => {
-      // Execute the binary with command line arguments
+      // Execute the binary with command line arguments and MPS Fallback enabled
       const child = spawn(this.binaryPath, [this.modelPath, sanitizedText], {
         stdio: ['pipe', 'pipe', 'pipe'],
         shell: false,
-        env: process.env
+        env: {
+          ...process.env,
+          PYTORCH_ENABLE_MPS_FALLBACK: '1'
+        }
       });
 
       let stdoutData = '';

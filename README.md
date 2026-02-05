@@ -206,14 +206,22 @@ See [FINAL_BENCHMARK.md](./FINAL_BENCHMARK.md) for detailed analysis and methodo
 - C++ LibTorch: <1 second
 - C++ ONNX: <1 second
 
-## 🤝 Use Cases
+## 🤝 Integration with OpenClaw
 
-- **Local RAG (Retrieval-Augmented Generation)**: Privacy-preserving document search
-- **Semantic Search**: Fast similarity matching for knowledge bases
-- **Content Recommendation**: Find related articles/documents
-- **Duplicate Detection**: Identify similar content
-- **Classification**: Pre-compute embeddings for ML pipelines
-- **OpenClaw Memory Plugins**: Enhance your AI assistant with semantic memory
+To use this high-performance engine in your OpenClaw environment:
+
+1. **Deploy Binary**:
+   ```bash
+   ln -sf $(pwd)/bin/arctic_embed_libtorch ~/.openclaw/workspace/arctic_embed_mps
+   ```
+
+2. **Deploy Model**:
+   Copy `arctic_model_mps.pt` to `~/.openclaw/workspace/`.
+
+3. **Update Plugin**:
+   Use the provided `src/arctic-embeddings-lancedb.ts` which automatically enables MPS acceleration and provides the necessary environment variables (`PYTORCH_ENABLE_MPS_FALLBACK=1`).
+
+This setup ensures that your AI assistant's semantic memory is powered by the fastest embedding engine available for M1/M2/M3 chips.
 
 ## 📁 Project Structure
 
