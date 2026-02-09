@@ -1,6 +1,8 @@
-# Model files (too large for git)
+# Model files
 *.onnx
-arctic_model.*
+
+# LibTorch local symlinks
+libtorch/lib
 
 # Python
 __pycache__/
